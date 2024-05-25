@@ -2,6 +2,7 @@ import pygame
 from paddle import Paddle
 from ball import Ball
 from brick import Brick
+
 pygame.init()
 
 WHITE = (255,255,255)
@@ -24,28 +25,31 @@ paddle.rect.x = 350
 paddle.rect.y = 560
 
 ball = Ball(WHITE,10,10)
-ball.rect.x = 345
-ball.rect.y = 195
+ball_start_x = 395
+ball_start_y = 295
+
+ball.rect.x = ball_start_x
+ball.rect.y = ball_start_y
 
 all_bricks = pygame.sprite.Group()
 
 for i in range(7):
     brick = Brick(RED,80,30)
-    brick.rect.x = 60 + i* 100
+    brick.rect.x = 60 + i * 100
     brick.rect.y = 60
     all_sprites_list.add(brick)
     all_bricks.add(brick)
     
 for i in range(7):
     brick = Brick(ORANGE,80,30)
-    brick.rect.x = 60 + i* 100
+    brick.rect.x = 60 + i * 100
     brick.rect.y = 100
     all_sprites_list.add(brick)
     all_bricks.add(brick)
     
 for i in range(7):
     brick = Brick(YELLOW,80,30)
-    brick.rect.x = 60 + i* 100
+    brick.rect.x = 60 + i * 100
     brick.rect.y = 140
     all_sprites_list.add(brick)
     all_bricks.add(brick)
@@ -56,6 +60,11 @@ all_sprites_list.add(ball)
 carryOn = True
 
 clock = pygame.time.Clock()
+
+def reset_ball():
+    ball.rect.x = paddle.rect.x + paddle.rect.width // 2 - ball.rect.width // 2
+    ball.rect.y = ball_start_y
+    ball.velocity = [4, 0]
 
 while carryOn:
     for event in pygame.event.get():
@@ -72,14 +81,10 @@ while carryOn:
         
     all_sprites_list.update()
     
-    if ball.rect.x>=790:
-        ball.velocity[0] = -ball.velocity[0]
-        
-    if ball.rect.x<=0:
-        ball.velocity[0] = -ball.velocity[0]
-        
-    if ball.rect.y>590:
+    if ball.rect.x >= 790 or ball.rect.x <= 0:
         ball.velocity[1] = -ball.velocity[1]
+        
+    if ball.rect.y > 590:
         lives -= 1
         if lives == 0:
             font = pygame.font.Font(None, 74)
@@ -87,29 +92,31 @@ while carryOn:
             screen.blit(text, (250,300))
             pygame.display.flip()
             pygame.time.wait(3000)
-            carryOn=False
+            carryOn = False
+        else:
+            reset_ball()
             
-    if ball.rect.y<40:
-        ball.velocity[1] = -ball.velocity[1]
+    if ball.rect.y < 40:
+        ball.velocity[0] = -ball.velocity[0]
         
     if pygame.sprite.collide_mask(ball, paddle):
-      ball.rect.x -= ball.velocity[0]
-      ball.rect.y -= ball.velocity[1]
-      ball.bounce()
+        ball.rect.x -= ball.velocity[1]
+        ball.rect.y -= ball.velocity[0]
+        ball.bounce()
       
     brick_collision_list = pygame.sprite.spritecollide(ball,all_bricks,False)
     
     for brick in brick_collision_list:
-      ball.bounce()
-      score += 1
-      brick.kill()
-      if len(all_bricks)==0:
+        ball.bounce()
+        score += 1
+        brick.kill()
+        if len(all_bricks) == 0:
             font = pygame.font.Font(None, 74)
             text = font.render("LEVEL COMPLETE", 1, WHITE)
             screen.blit(text, (200,300))
             pygame.display.flip()
             pygame.time.wait(3000)
-            carryOn=False
+            carryOn = False
             
     screen.fill(DARKBLUE)
     pygame.draw.line(screen, WHITE, [0, 38], [800, 38], 2)
