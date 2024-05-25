@@ -69,7 +69,7 @@ def reset_ball():
 while carryOn:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-              carryOn = False
+            carryOn = False
               
     keys = pygame.key.get_pressed()
     
@@ -100,9 +100,7 @@ while carryOn:
         ball.velocity[0] = -ball.velocity[0]
         
     if pygame.sprite.collide_mask(ball, paddle):
-        ball.rect.x -= ball.velocity[1]
-        ball.rect.y -= ball.velocity[0]
-        ball.bounce()
+        paddle.collide_with_ball(ball)
       
     brick_collision_list = pygame.sprite.spritecollide(ball,all_bricks,False)
     
@@ -110,13 +108,14 @@ while carryOn:
         ball.bounce()
         score += 1
         brick.kill()
-        if len(all_bricks) == 0:
-            font = pygame.font.Font(None, 74)
-            text = font.render("LEVEL COMPLETE", 1, WHITE)
-            screen.blit(text, (200,300))
-            pygame.display.flip()
-            pygame.time.wait(3000)
-            carryOn = False
+    
+    if len(all_bricks) == 0:
+        font = pygame.font.Font(None, 74)
+        text = font.render("LEVEL COMPLETE", 1, WHITE)
+        screen.blit(text, (200,300))
+        pygame.display.flip()
+        pygame.time.wait(3000)
+        carryOn = False
             
     screen.fill(DARKBLUE)
     pygame.draw.line(screen, WHITE, [0, 38], [800, 38], 2)
