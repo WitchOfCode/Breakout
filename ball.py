@@ -1,24 +1,29 @@
 import pygame
-from config import *
-import time
+from random import randint
 
-class Ball:
-    def __init__(self, x, y):
-        self.position = pygame.Vector2(x, y)
-        self.velocity = pygame.Vector2(BALL_X_VELOCITY, BALL_Y_VELOCITY)
-        self.radius = BALL_RADIUS
-
+BLACK = (0, 0, 0)
+ 
+class Ball(pygame.sprite.Sprite):
+    
+    def __init__(self, color, width, height):
+        super().__init__()
+        
+        self.image = pygame.Surface([width, height])
+        self.image.fill(BLACK)
+        self.image.set_colorkey(BLACK)
+ 
+        pygame.draw.rect(self.image, color, [0, 0, width, height])
+        
+        self.velocity = [randint(4,8),randint(-8,8)]
+        
+        self.rect = self.image.get_rect()
+        
     def update(self):
-        self.position += self.velocity
-        self.check_collision_with_walls()
-
-    def check_collision_with_walls(self):
-        if self.position.x <= 0 or self.position.x >= WINDOW_WIDTH:
-            self.velocity.x *= -1
-        if self.position.y <= 0:
-            self.velocity.y *= -1
-
-    def draw(self, surface):
-        pygame.draw.circle(surface, BLUE, (int(self.position.x), int(self.position.y)), self.radius)
+        self.rect.x += self.velocity[1]
+        self.rect.y += self.velocity[0]
+          
+    def bounce(self):
+        self.velocity[0] = -self.velocity[0]
+        self.velocity[1] = randint(-8,8), self.radius
 
 
